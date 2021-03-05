@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   String _password;
   MyService _service;
   bool _passwordVisible;
-  bool  _loginPref = false;
+  bool _loginPref = false;
 
   @override
   void initState() {
@@ -66,12 +66,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void save() async {
     await init();
-    if(_loginPref == false){
-    await prefences.setBool('autoLogin', true);
-    await prefences.setString('savedEmail', _email);
-    await prefences.setString('savedPassword', _password);
+    if (_loginPref == false) {
+      await prefences.setBool('autoLogin', true);
+      await prefences.setString('savedEmail', _email);
+      await prefences.setString('savedPassword', _password);
     }
-
   }
 
   void checkAutoLogin() async {

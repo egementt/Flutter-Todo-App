@@ -12,6 +12,7 @@ class Body {
 		this.userId,
 		this.isActive,
 	});
+  
 
 	@override
 	String toString() {
