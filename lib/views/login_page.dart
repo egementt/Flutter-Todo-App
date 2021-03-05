@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todo/main.dart';
 import 'package:flutter_todo/service/api.dart';
 import 'package:flutter_todo/ui/components/bottom_nav_bar.dart';
 import 'package:flutter_todo/ui/components/error_snackbar.dart';
 import 'package:flutter_todo/utils/utils.dart';
-
-TextEditingController _usernameController;
-TextEditingController _passwordController;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -15,15 +14,18 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String email;
-  String password;
+  String _email;
+  String _password;
   MyService _service;
   bool _passwordVisible;
+  bool  _loginPref = false;
 
   @override
   void initState() {
+    init();
     _service = MyService();
     _passwordVisible = false;
+    checkAutoLogin();
     super.initState();
   }
 
@@ -38,15 +40,15 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            loginTextField("Email", _usernameController, false),
+            loginTextField("Email", false),
             SizedBox(
               height: 8,
             ),
-            loginTextField("Password", _passwordController, true),
+            loginTextField("Password", true),
             FlatButton(
                 color: ThemeData().accentColor,
                 onPressed: () {
-                  loginUser();
+                  loginUser(_email, _password);
                 },
                 child: const Text(
                   "Login",
@@ -58,13 +60,40 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void loginUser() {
+  static Future init() async {
+    prefences = await SharedPreferences.getInstance();
+  }
+
+  void save() async {
+    await init();
+    if(_loginPref == false){
+    await prefences.setBool('autoLogin', true);
+    await prefences.setString('savedEmail', _email);
+    await prefences.setString('savedPassword', _password);
+    }
+
+  }
+
+  void checkAutoLogin() async {
+    await init();
+    if (prefences != null) {
+      final loginPref = prefences.getBool('autoLogin');
+      final savedEmail = prefences.getString('savedEmail');
+      final savedPassword = prefences.getString('savedPassword');
+
+      if (loginPref == true) {
+        loginUser(savedEmail, savedPassword);
+      }
+    }
+  }
+
+  void loginUser(String email, String password) {
     _service.loginFunc(email, password).then((result) {
       if (result != null) {
         setState(() {
           currentUser = result;
         });
-        print(currentUser.userId);
+        save();
         checkLoginSuccess(currentUser.status);
       } else {
         errorSnackbar("Connection failed");
@@ -83,13 +112,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Widget loginTextField(
-      String label, TextEditingController controller, bool isPassword) {
+  Widget loginTextField(String label, bool isPassword) {
     return Padding(
       padding: myPadding(),
       child: TextField(
         obscureText: isPassword == true ? _passwordVisible : false,
-        controller: controller,
         decoration: isPassword == true
             ? InputDecoration(
                 // Eğer textfield bir şifre içeriyorsa, şifreyi görmek için Icon oluştur.
@@ -110,9 +137,9 @@ class _LoginPageState extends State<LoginPage> {
               ),
         onChanged: (value) {
           if (label == "Email")
-            email = value;
+            _email = value;
           else
-            password = value;
+            _password = value;
         },
       ),
     );

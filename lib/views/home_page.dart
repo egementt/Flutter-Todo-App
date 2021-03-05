@@ -4,7 +4,7 @@ import 'package:flutter_todo/service/api.dart';
 import 'package:flutter_todo/utils/utils.dart';
 import 'package:flutter_todo/views/add_todo_page.dart';
 import 'package:flutter_todo/views/login_page.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key key}) : super(key: key);
@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     _service = MyService();
     _myFutureList = _service.getAll();
+    init();
     super.initState();
   }
 
@@ -35,6 +36,7 @@ class _HomePageState extends State<HomePage> {
               child: IconButton(
                   icon: Icon(Icons.power_settings_new),
                   onPressed: () {
+                    save();
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => LoginPage()));
                   }),
@@ -129,6 +131,15 @@ class _HomePageState extends State<HomePage> {
             },
           );
         });
+  }
+
+  static Future init() async {
+    prefences = await SharedPreferences.getInstance();
+  }
+
+  void save() async {
+    await init();
+    prefences.clear();
   }
 
   ListTile _myListTile(String name, String dateTime) {

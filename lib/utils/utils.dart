@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo/models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //current User
 User currentUser;
+
+SharedPreferences prefences;
+
+
 
 // Padding values for textFields.
 
