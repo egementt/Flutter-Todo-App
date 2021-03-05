@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_todo/main.dart';
 import 'package:flutter_todo/service/api.dart';
 import 'package:flutter_todo/ui/components/bottom_nav_bar.dart';
 import 'package:flutter_todo/ui/components/error_snackbar.dart';
